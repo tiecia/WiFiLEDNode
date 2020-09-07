@@ -1,0 +1,56 @@
+{
+    "description": "Library to get system sync from a NTP server", 
+    "repository": {
+        "url": "https://github.com/gmag11/NtpClient.git", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif8266", 
+        "espressif32"
+    ], 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "3.0.2-beta", 
+    "examples": "examples/*/*.ino", 
+    "dependencies": [
+        {
+            "version": "~1.5", 
+            "name": "Time", 
+            "authors": "Paul Stoffregen"
+        }, 
+        {
+            "platforms": [
+                "espressif8266"
+            ], 
+            "name": "ESPAsyncUDP", 
+            "authors": "Hristo Gochkov"
+        }
+    ], 
+    "authors": [
+        {
+            "url": null, 
+            "maintainer": false, 
+            "email": "gmag11@gmail.com", 
+            "name": "Germ\u00e1n Mart\u00edn"
+        }
+    ], 
+    "keywords": [
+        "week", 
+        "rtc", 
+        "hour", 
+        "ntp", 
+        "year", 
+        "month", 
+        "second", 
+        "time", 
+        "date", 
+        "day", 
+        "minute"
+    ], 
+    "homepage": "https://github.com/gmag11/NtpClient", 
+    "id": 727, 
+    "name": "NtpClientLib"
+}
