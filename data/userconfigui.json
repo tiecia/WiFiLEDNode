@@ -1,0 +1,41 @@
+{
+    "groups": [
+        {
+            "title": "Node Configuration",
+            "entities": [
+                {
+                    "name": "lednum",
+                    "title": "Number of LEDs",
+                    "attributes": {
+                        "type": "number",
+                        "required": "1"
+                    }
+                },
+                {
+                    "name": "broadcastname",
+                    "title": "Artnet Broadcast Name",
+                    "attributes": {
+                        "type": "input",
+                        "maxlength": 30,
+                        "pattern": "^[a-zA-Z0-9]*$",
+                        "required": "1"
+                    }
+                },
+                {
+                    "name": "enablebuiltinled",
+                    "title": "Internal ArtNet Indication LED",
+                    "attributes": {
+                        "type": "checkbox"
+                    }
+                },
+                {
+                    "name": "enableexternalled",
+                    "title": "External ArtNet Indication LED",
+                    "attributes": {
+                        "type": "checkbox"
+                    }
+                }
+            ]
+        }
+    ]
+}

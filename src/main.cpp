@@ -38,6 +38,7 @@ const int numLeds = 510; // CHANGE FOR YOUR SETUP
 const int numberOfChannels = numLeds * 3; // Total number of channels you want to receive (1 led = 3 channels)
 
 
+
 CRGB leds[numLeds];
 
 // Art-Net settings
@@ -49,7 +50,6 @@ const int maxUniverses = numberOfChannels / 512 + ((numberOfChannels % 512) ? 1 
 bool universesReceived[maxUniverses];
 bool sendFrame = 1;
 int previousDataLength = 0;
-
 int lastFrameTime;
 
 int lastDebug;
@@ -86,7 +86,6 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* d
 {
   lastFrameTime = millis();
   indicateDataRecieve(HIGH);
-  // delay(50);
 
 
   sendFrame = 1;
@@ -139,10 +138,11 @@ void setup() {
   ESPHTTPServer.begin(&SPIFFS);
   /* add setup code here */
 
+  //Apply user FSServer user settings
+
+
   pinMode(ARTNET_INDICATION_LIGHT, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-
-  
 
   // Serial.begin(9600);
   artnet.setName("LED Node (ESP8266)");
@@ -161,6 +161,13 @@ int readTemp(){
       float temperaturek = millivolts / 10;
       float temperaturec = temperaturek - 273.15;
       float temperaturef = (temperaturec * 1.8) + 32;
+
+
+      
+      // int I = 0;
+      // ESPHTTPServer.load_user_config("Test", I);
+      // Serial.print(" USER CONFIG");
+      // Serial.println(I);
 
       // Serial.print("Temp K: ");
       // Serial.println(temperaturek);
