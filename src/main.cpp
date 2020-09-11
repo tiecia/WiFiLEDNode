@@ -145,6 +145,7 @@ void setup() {
   
 
   // Serial.begin(9600);
+  artnet.setName("LED Node (ESP8266)");
   artnet.begin();
   FastLED.addLeds<WS2812, ADDRESSABLE_LED_PIN, GRB>(leds, numLeds);
   initTest();
