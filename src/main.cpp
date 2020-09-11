@@ -13,6 +13,7 @@
 #include <Hash.h>
 
 #include <ArtnetWifi.h>
+#include <ArtnetnodeWifi.h>
 #include <Arduino.h>
 #include <FastLED.h>
 
@@ -40,7 +41,7 @@ const int numberOfChannels = numLeds * 3; // Total number of channels you want t
 CRGB leds[numLeds];
 
 // Art-Net settings
-ArtnetWifi artnet;
+ArtnetnodeWifi artnet;
 const int startUniverse = 0; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
 
 // Check if we got all universes
@@ -144,6 +145,7 @@ void setup() {
   
 
   // Serial.begin(9600);
+  artnet.setName("LED Node (ESP8266)");
   artnet.begin();
   FastLED.addLeds<WS2812, ADDRESSABLE_LED_PIN, GRB>(leds, numLeds);
   initTest();
