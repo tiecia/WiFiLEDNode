@@ -6,3 +6,8 @@
 *.code-workspace
 
 .vscode/
+
+.pio/build
+/include
+/lib
+/test

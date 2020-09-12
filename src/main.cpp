@@ -12,7 +12,6 @@
 #include <FSWebServerLib.h>
 #include <Hash.h>
 
-#include <ArtnetWifi.h>
 #include <ArtnetnodeWifi.h>
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
