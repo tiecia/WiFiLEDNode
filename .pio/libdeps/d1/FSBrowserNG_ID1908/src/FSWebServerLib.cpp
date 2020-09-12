@@ -1416,7 +1416,6 @@ void AsyncFSWebServer::handle_rest_config(AsyncWebServerRequest *request) {
 void AsyncFSWebServer::post_rest_config(AsyncWebServerRequest *request) {
 
 	String target = "/";
-
 	for (uint8_t i = 0; i < request->args(); i++) {
 		DEBUGLOG("Arg %d: %s\r\n", i, request->arg(i).c_str());
 		DEBUGLOG(request->argName(i).c_str());
@@ -1439,7 +1438,9 @@ void AsyncFSWebServer::post_rest_config(AsyncWebServerRequest *request) {
 	DEBUGLOG(__PRETTY_FUNCTION__);
 	DEBUGLOG("\r\n");
 
-
+	_fs->end();
+	delay(1000);
+	ESP.restart();
 }
 
 

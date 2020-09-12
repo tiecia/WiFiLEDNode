@@ -12,12 +12,27 @@
                     }
                 },
                 {
+                    "name": "ledpin",
+                    "title": "LED Output Pin (Default: 5)",
+                    "attributes": {
+                        "type": "number",
+                        "required": "1"
+                    }
+                },
+                {
                     "name": "broadcastname",
                     "title": "Artnet Broadcast Name",
                     "attributes": {
                         "type": "input",
                         "maxlength": 30,
-                        "pattern": "^[a-zA-Z0-9]*$",
+                        "required": "1"
+                    }
+                },
+                {
+                    "name": "startuniverse",
+                    "title": "Starting ArtNet Universe",
+                    "attributes": {
+                        "type": "number",
                         "required": "1"
                     }
                 },
