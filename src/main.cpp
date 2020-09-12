@@ -15,7 +15,9 @@
 #include <ArtnetWifi.h>
 #include <ArtnetnodeWifi.h>
 #include <Arduino.h>
-#include <FastLED.h>
+#include <Adafruit_NeoPixel.h>
+#include <string>
+#include <cstring>
 
 #include "main.h"
 
@@ -34,59 +36,66 @@
 
 
 // LED settings
-const int numLeds = 510; // CHANGE FOR YOUR SETUP
-const int numberOfChannels = numLeds * 3; // Total number of channels you want to receive (1 led = 3 channels)
+int numLeds = NUM_LEDS; // CHANGE FOR YOUR SETUP
+int addressableledpin = ADDRESSABLE_LED_PIN;
+int numberOfChannels; // Total number of channels you want to receive (1 led = 3 channels)
+Adafruit_NeoPixel leds = Adafruit_NeoPixel();
 
+//Status LED settings, denote whether their respective led will be enabled or disabled.
+int internalled = INTERNAL_LED;
+int externalled = EXTERNAL_LED;
 
-CRGB leds[numLeds];
 
 // Art-Net settings
 ArtnetnodeWifi artnet;
-const int startUniverse = 0; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
+int startUniverse = ARTNET_START_UNIVERSE;
+String artnetbroadcastname = BROADCAST_NAME;
 
-// Check if we got all universes
-const int maxUniverses = numberOfChannels / 512 + ((numberOfChannels % 512) ? 1 : 0);
-bool universesReceived[maxUniverses];
+
+int maxUniverses;
+bool *universesReceived;
 bool sendFrame = 1;
 int previousDataLength = 0;
-
 int lastFrameTime;
 
 int lastDebug;
 
 void indicateDataRecieve(bool state){
-  digitalWrite(ARTNET_INDICATION_LIGHT, state);
-  digitalWrite(LED_BUILTIN, !state);
+  if(externalled){
+    digitalWrite(ARTNET_INDICATION_LIGHT, state);
+  }
+  if(internalled){
+    digitalWrite(LED_BUILTIN, !state);
+  }
 }
 
 void initTest()
 {
   for (int i = 0 ; i < numLeds ; i++) {
-    leds[i] = CRGB(127, 0, 0);
+    leds.setPixelColor(i, 127, 0, 0);
   }
-  FastLED.show();
+  leds.show();
   delay(500);
   for (int i = 0 ; i < numLeds ; i++) {
-    leds[i] = CRGB(0, 127, 0);
+    leds.setPixelColor(i, 0, 127, 0);
   }
-  FastLED.show();
+  leds.show();
   delay(500);
   for (int i = 0 ; i < numLeds ; i++) {
-    leds[i] = CRGB(0, 0, 127);
+    leds.setPixelColor(i, 0, 0, 127);
   }
-  FastLED.show();
+  leds.show();
   delay(500);
   for (int i = 0 ; i < numLeds ; i++) {
-    leds[i] = CRGB(0, 0, 0);
+    leds.setPixelColor(i, 0, 0, 0);
   }
-  FastLED.show();
+  leds.show();
 }
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)
 {
   lastFrameTime = millis();
   indicateDataRecieve(HIGH);
-  // delay(50);
 
 
   sendFrame = 1;
@@ -94,8 +103,8 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* d
   // set brightness of the whole strip
   if (universe == 15)
   {
-    FastLED.setBrightness(data[0]);
-    FastLED.show();
+    leds.setBrightness(data[0]);
+    leds.show();
   }
 
   // Store which universe has got in
@@ -117,14 +126,14 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* d
   {
     int led = i + (universe - startUniverse) * (previousDataLength / 3);
     if (led < numLeds)
-      leds[led] = CRGB(data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
+    leds.setPixelColor(led, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
   }
   previousDataLength = length;
 
   //Display frame if all universes recieved
   if (sendFrame)
   {
-    FastLED.show();
+    leds.show();
     // Reset universeReceived to 0
     memset(universesReceived, 0, maxUniverses);
   }
@@ -139,19 +148,52 @@ void setup() {
   ESPHTTPServer.begin(&SPIFFS);
   /* add setup code here */
 
+  //Fetch user settings from FSServer if config file exists. If file does not exist create one and write the default values to it.
+  String broadcast_fetch;
+  ESPHTTPServer.load_user_config("broadcastname", broadcast_fetch);
+  if(broadcast_fetch == ""){
+    ESPHTTPServer.save_user_config("lednum", numLeds);
+    ESPHTTPServer.save_user_config("ledpin", addressableledpin);
+    ESPHTTPServer.save_user_config("broadcastname", artnetbroadcastname);
+    ESPHTTPServer.save_user_config("startuniverse", startUniverse);
+    ESPHTTPServer.save_user_config("enablebuiltinled", internalled);
+    ESPHTTPServer.save_user_config("enableexternalled", externalled);
+  } else {
+    artnetbroadcastname = broadcast_fetch;
+    ESPHTTPServer.load_user_config("lednum", numLeds);
+    ESPHTTPServer.load_user_config("ledpin", addressableledpin);
+    ESPHTTPServer.load_user_config("startuniverse", startUniverse);
+    ESPHTTPServer.load_user_config("enablebuiltinled", internalled);
+    ESPHTTPServer.load_user_config("enableexternalled", externalled);
+  }
+
+
+
+  //Apply user FSServer user settings
+  leds.updateType(NEO_GRB + NEO_KHZ800);
+  leds.updateLength(numLeds);
+  leds.setPin(addressableledpin);
+  
+  char name[artnetbroadcastname.length() + 1];
+  strcpy(name, artnetbroadcastname.c_str());
+  artnet.setName(name);
+
+  numberOfChannels = numLeds * 3;
+  maxUniverses = numberOfChannels / 512 + ((numberOfChannels % 512) ? 1 : 0);
+  universesReceived = (bool *)malloc(sizeof(maxUniverses));
+
+  //Set status led pin modes
   pinMode(ARTNET_INDICATION_LIGHT, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  
-
-  // Serial.begin(9600);
-  artnet.setName("LED Node (ESP8266)");
+  leds.begin();
   artnet.begin();
-  FastLED.addLeds<WS2812, ADDRESSABLE_LED_PIN, GRB>(leds, numLeds);
+  artnet.setArtDmxCallback(onDmxFrame);
+
   initTest();
 
-  // this will be called for each packet received
-  artnet.setArtDmxCallback(onDmxFrame);
+  //Note: HIGH on the Wemos D1 builtin led is off.
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 
 int readTemp(){
@@ -189,7 +231,7 @@ void loop() {
 
     if(millis() - lastDebug > 500){
       lastDebug = millis();
-    //   //Put debug code here
+      //Put debug code here
     }
 
     // DO NOT REMOVE. Attend OTA update from Arduino IDE

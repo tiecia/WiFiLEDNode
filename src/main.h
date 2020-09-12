@@ -1,6 +1,12 @@
 #define ARTNET_INDICATION_LIGHT 12
 
+// Default configuration values
 #define ADDRESSABLE_LED_PIN 5
+#define NUM_LEDS 60
+#define INTERNAL_LED 1
+#define EXTERNAL_LED 1
+#define BROADCAST_NAME "ESPWifiLEDNode"
+#define ARTNET_START_UNIVERSE 0
 
 #define TEMPERATURE_SENSOR 0
 #define TEMP_SENSOR_VOLTAGE 3.3
